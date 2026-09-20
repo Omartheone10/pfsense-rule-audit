@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<pfsense>
+<aliases>
+  <alias>
+    <name>WebServers</name>
+    <address>192.168.1.100 192.168.1.101</address>
+  </alias>
+</aliases>
+  <filter>
+    <rule>
+      <type>pass</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination>
+        <address>192.168.1.100</address>
+        <port>443</port>
+      </destination>
+    </rule>
+    <rule>
+      <type>block</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination><any/></destination>
+    </rule>
+     <rule>
+      <type>block</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source>
+      <address> 10.0.0.5</address>
+      </source>
+      <destination>
+      <address>192.168.1.100</address>
+      <port>22</port>
+      </destination>
+    </rule>
+
+    <rule>
+      <type>block</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source>
+      <address> 10.0.0.5</address>
+      </source>
+      <destination>
+      <address>WebServers</address>
+      <port>22</port>
+      </destination>
+    </rule>
+    <rule>
+      <type>pass</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination><any/></destination>
+    </rule>
+    
+
+
+  </filter>
+</pfsense>
