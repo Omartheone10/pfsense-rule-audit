@@ -36,4 +36,3 @@ for rule in root.findall(".//rule"):
         print("CRITICAL FINDING: any-any pass on WAN!")
 
     print(action, source, dest_addr, dest_port)
-
