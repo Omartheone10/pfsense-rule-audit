@@ -1,16 +1,19 @@
 import xml.etree.ElementTree as ET
-etree = ET.parse('sample_config.xml')
-root =etree.getroot()
+tree = ET.parse('sample_config.xml')
+root =tree.getroot()
 
 for rule in root.findall('.//rule'):
-    i_face = rule.find('interface')
-    if i_face is not None:
-        i_faceText = i_face.text
-        if i_faceText == 'wan':
-            i_type = rule.find('type')
-            if i_type is not None:
-                i_typeText = i_type.text
-                print( i_faceText , i_typeText )
+    interface = rule.find('interface')
+    if interface is not None:
+        interface_name = interface.text
+        if interface_name == 'wan':
+            source_any = rule.find('source/any')
+            if source_any is not None:
+                print('CRITICAL: WAN rule allows ANY source')
+            rule_type = rule.find('type')
+            if rule_type is not None:
+                rule_type_name = rule_type.text
+                print( interface_name , rule_type_name )
 
 
 
