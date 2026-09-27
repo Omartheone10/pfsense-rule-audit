@@ -1,18 +1,23 @@
 import xml.etree.ElementTree as ET
 tree = ET.parse('sample_config.xml')
 root =tree.getroot()
-
+# Find all the 'rule' one by one
 for rule in root.findall('.//rule'):
+    # Find the interface tag
     interface = rule.find('interface')
     if interface is not None:
         interface_name = interface.text
         if interface_name == 'wan':
+            # Find source tag's child element any
             source_any = rule.find('source/any')
-            if source_any is not None:
-                print('CRITICAL: WAN rule allows ANY source')
+            # Find destination tag's child element any
+            dest_any = rule.find('destination/any')
             rule_type = rule.find('type')
             if rule_type is not None:
                 rule_type_name = rule_type.text
+                 # # Flag true any-any rules (source any + dest any + action pass)
+                if source_any is not None and rule_type_name == 'pass' and dest_any is not None:
+                    print('CRITICAL:True Any-Any rule on WAN!')
                 print( interface_name , rule_type_name )
 
 
