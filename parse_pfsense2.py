@@ -15,9 +15,16 @@ for rule in root.findall('.//rule'):
             rule_type = rule.find('type')
             if rule_type is not None:
                 rule_type_name = rule_type.text
-                 # # Flag true any-any rules (source any + dest any + action pass)
+                # Flag true any-any rules (source any + dest any + action pass)
                 if source_any is not None and rule_type_name == 'pass' and dest_any is not None:
-                    print('CRITICAL:True Any-Any rule on WAN!')
+                   # Creating a dictionary
+                    finding = {
+                        "severity": "CRITICAL",
+                        "action": rule_type_name,
+                        "message": "True Any-Any rule on WAN"
+                    }
+                    print(finding)
+
                 print( interface_name , rule_type_name )
 
 
