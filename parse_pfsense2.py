@@ -1,6 +1,9 @@
 import xml.etree.ElementTree as ET
 tree = ET.parse('sample_config.xml')
 root =tree.getroot()
+
+findings = []
+
 # Find all the 'rule' one by one
 for rule in root.findall('.//rule'):
     # Find the interface tag
@@ -24,9 +27,10 @@ for rule in root.findall('.//rule'):
                         "message": "True Any-Any rule on WAN"
                     }
                     print(finding)
+                    findings.append(finding)
 
                 print( interface_name , rule_type_name )
 
-
+print(findings)
 
 
