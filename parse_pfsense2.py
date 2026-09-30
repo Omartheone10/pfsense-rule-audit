@@ -7,6 +7,7 @@ findings = []
 rule_index = 1
 for rule in root.findall('.//rule'):
 
+    # Finding if a rule is already disabled
     disabled_rule = rule.find('disabled')
     if disabled_rule is not None:
         finding = {
@@ -17,7 +18,7 @@ for rule in root.findall('.//rule'):
         }
         findings.append(finding)
 
-
+    # Finding if a rule missing the description tag
     descr = rule.find('descr')
     if descr is None:
         finding = {
@@ -35,6 +36,7 @@ for rule in root.findall('.//rule'):
         if interface_name == 'wan':
             # Find source tag's child element any
             source_any = rule.find('source/any')
+
             # Find destination tag's child element any
             dest_any = rule.find('destination/any')
             rule_type = rule.find('type')
@@ -52,10 +54,21 @@ for rule in root.findall('.//rule'):
                     }
                     findings.append(finding)
                     print(finding)
+
+                port = rule.find('destination/port')
+                if port is not None:
+                    port_number = port.text
+                    if (port_number == "22" or port_number == "80" or port_number == "443") and rule_type_name == "pass":
+                        finding = {
+                            "rule_index": rule_index,
+                            "severity": "HIGH",
+                            "score": 4,
+                            "message": "Admin service exposed on WAN"
+                        }
+                        findings.append(finding)
+
                 print( interface_name , rule_type_name )
     rule_index += 1
-
-
 print(findings)
 
 

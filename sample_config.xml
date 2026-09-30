@@ -88,6 +88,8 @@
       <destination><any/></destination>
       <descr>Temporary debugging rule - remove after incident</descr>
     </rule>
+
+    <!-- Rule 8: disabled rule on LAN. HAS descr. Fires LOW only. -->
     <rule>
       <type>pass</type>
       <interface>lan</interface>
@@ -96,6 +98,19 @@
       <destination><any/></destination>
       <descr>Old testing rule</descr>
       <disabled/>
+    </rule>
+
+    <!-- Rule 9: pass, WAN, port 22. HAS descr. Fires HIGH (Admin Services) only. -->
+    <rule>
+      <type>pass</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination>
+        <address>192.168.1.100</address>
+        <port>22</port>
+      </destination>
+      <descr>Remote SSH access for admin</descr>
     </rule>
 
   </filter>
