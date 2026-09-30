@@ -7,6 +7,20 @@ findings = []
 rule_index = 1
 for rule in root.findall('.//rule'):
 
+    rule_type = rule.find('type')
+    if rule_type is not None:
+        rule_type_name = rule_type.text
+        rule_log = rule.find('log')
+        if rule_log is None and rule_type_name == 'block':
+            finding = {
+                "rule_index": rule_index,
+                "severity": "MEDIUM",
+                "score": 3,
+                "message": 'Rule missing log'
+            }
+            findings.append(finding)
+
+
     # Finding if a rule is already disabled
     disabled_rule = rule.find('disabled')
     if disabled_rule is not None:

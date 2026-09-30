@@ -113,5 +113,21 @@
       <descr>Remote SSH access for admin</descr>
     </rule>
 
+        <!-- Rule 10: block, WAN, with log. HAS descr + log. Should fire ZERO findings. -->
+    <rule>
+      <type>block</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source>
+        <address>10.0.0.99</address>
+      </source>
+      <destination>
+        <address>192.168.1.100</address>
+        <port>3389</port>
+      </destination>
+      <descr>Block RDP from suspicious host - logged for SIEM</descr>
+      <log/>
+    </rule>
+
   </filter>
 </pfsense>
