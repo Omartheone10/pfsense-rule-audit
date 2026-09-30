@@ -1,11 +1,21 @@
 import xml.etree.ElementTree as ET
 tree = ET.parse('sample_config.xml')
-root =tree.getroot()
+root = tree.getroot()
 
 findings = []
-
 # Find all the 'rule' one by one
+rule_index = 1
 for rule in root.findall('.//rule'):
+
+    descr = rule.find('descr')
+    if descr is None:
+        finding = {
+            "rule_index": rule_index,
+            "severity": "MEDIUM",
+            "score": 3,
+            "message": "Rule missing description"
+        }
+        findings.append(finding)
     # Find the interface tag
     interface = rule.find('interface')
     if interface is not None:
@@ -22,15 +32,17 @@ for rule in root.findall('.//rule'):
                 if source_any is not None and rule_type_name == 'pass' and dest_any is not None:
                    # Creating a dictionary
                     finding = {
+                        "rule_index": rule_index,
                         "severity": "CRITICAL",
                         "score": 5,
                         "action": rule_type_name,
                         "message": "True Any-Any rule on WAN"
                     }
-                    print(finding)
                     findings.append(finding)
-
+                    print(finding)
                 print( interface_name , rule_type_name )
+    rule_index += 1
+
 
 print(findings)
 

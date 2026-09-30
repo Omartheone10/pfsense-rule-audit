@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <pfsense>
-<aliases>
-  <alias>
-    <name>WebServers</name>
-    <address>192.168.1.100 192.168.1.101</address>
-  </alias>
-</aliases>
+  <aliases>
+    <alias>
+      <name>WebServers</name>
+      <address>192.168.1.100 192.168.1.101</address>
+    </alias>
+  </aliases>
+
   <filter>
+    <!-- Rule 1: pass, WAN, specific dest. No descr. -->
     <rule>
       <type>pass</type>
       <interface>wan</interface>
@@ -17,6 +19,8 @@
         <port>443</port>
       </destination>
     </rule>
+
+    <!-- Rule 2: block any-any. No descr. Should NOT be CRITICAL. -->
     <rule>
       <type>block</type>
       <interface>wan</interface>
@@ -24,31 +28,37 @@
       <source><any/></source>
       <destination><any/></destination>
     </rule>
-     <rule>
-      <type>block</type>
-      <interface>wan</interface>
-      <protocol>tcp</protocol>
-      <source>
-      <address> 10.0.0.5</address>
-      </source>
-      <destination>
-      <address>192.168.1.100</address>
-      <port>22</port>
-      </destination>
-    </rule>
 
+    <!-- Rule 3: block, specific source + dest. No descr. -->
     <rule>
       <type>block</type>
       <interface>wan</interface>
       <protocol>tcp</protocol>
       <source>
-      <address> 10.0.0.5</address>
+        <address>10.0.0.5</address>
       </source>
       <destination>
-      <address>WebServers</address>
-      <port>22</port>
+        <address>192.168.1.100</address>
+        <port>22</port>
       </destination>
     </rule>
+
+    <!-- Rule 4: block, alias dest. HAS descr. No findings. -->
+    <rule>
+      <type>block</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source>
+        <address>10.0.0.5</address>
+      </source>
+      <destination>
+        <address>WebServers</address>
+        <port>22</port>
+      </destination>
+      <descr>Block SSH from known bad host</descr>
+    </rule>
+
+    <!-- Rule 5: true any-any pass on WAN. No descr. Fires BOTH checks. -->
     <rule>
       <type>pass</type>
       <interface>wan</interface>
@@ -56,8 +66,27 @@
       <source><any/></source>
       <destination><any/></destination>
     </rule>
-    
 
+    <!-- Rule 6: pass on LAN. No descr. Tests that descr check isn't WAN-only. -->
+    <rule>
+      <type>pass</type>
+      <interface>lan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination>
+        <address>192.168.1.100</address>
+        <port>443</port>
+      </destination>
+    </rule>
 
+    <!-- Rule 7: true any-any pass on WAN, WITH descr. Fires CRITICAL only. -->
+    <rule>
+      <type>pass</type>
+      <interface>wan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination><any/></destination>
+      <descr>Temporary debugging rule - remove after incident</descr>
+    </rule>
   </filter>
 </pfsense>
