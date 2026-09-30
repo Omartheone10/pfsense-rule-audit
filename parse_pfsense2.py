@@ -23,6 +23,7 @@ for rule in root.findall('.//rule'):
                    # Creating a dictionary
                     finding = {
                         "severity": "CRITICAL",
+                        "score": 5,
                         "action": rule_type_name,
                         "message": "True Any-Any rule on WAN"
                     }
