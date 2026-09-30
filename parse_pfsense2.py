@@ -7,6 +7,17 @@ findings = []
 rule_index = 1
 for rule in root.findall('.//rule'):
 
+    disabled_rule = rule.find('disabled')
+    if disabled_rule is not None:
+        finding = {
+            "rule_index": rule_index,
+            "severity": 'LOW',
+            "score": 2,
+            "message": "Rule is disabled - consider cleanup"
+        }
+        findings.append(finding)
+
+
     descr = rule.find('descr')
     if descr is None:
         finding = {
@@ -16,6 +27,7 @@ for rule in root.findall('.//rule'):
             "message": "Rule missing description"
         }
         findings.append(finding)
+
     # Find the interface tag
     interface = rule.find('interface')
     if interface is not None:

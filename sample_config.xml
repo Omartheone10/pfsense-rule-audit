@@ -88,5 +88,15 @@
       <destination><any/></destination>
       <descr>Temporary debugging rule - remove after incident</descr>
     </rule>
+    <rule>
+      <type>pass</type>
+      <interface>lan</interface>
+      <protocol>tcp</protocol>
+      <source><any/></source>
+      <destination><any/></destination>
+      <descr>Old testing rule</descr>
+      <disabled/>
+    </rule>
+
   </filter>
 </pfsense>
