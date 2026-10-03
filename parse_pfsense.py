@@ -81,7 +81,7 @@ for rule in root.findall('./filter/rule'):
                         }
                         findings.append(finding)
 
-                print( interface_name , rule_type_name )
+
     rule_index += 1
 print(findings)
 
