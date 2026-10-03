@@ -5,7 +5,7 @@ root = tree.getroot()
 findings = []
 # Find all the 'rule' one by one
 rule_index = 1
-for rule in root.findall('.//rule'):
+for rule in root.findall('./filter/rule'):
 
     rule_type = rule.find('type')
     if rule_type is not None:
