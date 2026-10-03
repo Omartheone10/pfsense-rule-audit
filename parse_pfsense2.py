@@ -67,7 +67,7 @@ for rule in root.findall('.//rule'):
                         "message": "True Any-Any rule on WAN"
                     }
                     findings.append(finding)
-                    print(finding)
+                    
 
                 port = rule.find('destination/port')
                 if port is not None:
