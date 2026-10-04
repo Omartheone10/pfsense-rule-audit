@@ -19,3 +19,8 @@ def test_medium_findings_count():
     result = audit("sample_config.xml")
     medium_findings = [f for f in result if f["severity"] == "MEDIUM"]
     assert len(medium_findings) == 8
+
+def test_low_findings_count():
+    result = audit("sample_config.xml")
+    low_findings = [f for f in result if f["severity"] == "LOW"]
+    assert len(low_findings) == 1
