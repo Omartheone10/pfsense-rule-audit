@@ -15,4 +15,7 @@ def test_critical_findings_count():
     critical_findings = [ f for f in result if f["severity"] == "CRITICAL"]
     assert len(critical_findings) == 2
 
-    
+def test_medium_findings_count():
+    result = audit("sample_config.xml")
+    medium_findings = [f for f in result if f["severity"] == "MEDIUM"]
+    assert len(medium_findings) == 8
