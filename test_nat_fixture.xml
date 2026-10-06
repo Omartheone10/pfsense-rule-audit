@@ -1,0 +1,14 @@
+<pfsense>
+  <nat>
+    <rule>
+      <interface>wan</interface>
+      <type>pass</type>
+    </rule>
+  </nat>
+  <filter>
+    <rule>
+      <interface>wan</interface>
+      <type>pass</type>
+    </rule>
+  </filter>
+</pfsense>

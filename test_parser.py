@@ -24,3 +24,8 @@ def test_low_findings_count():
     result = audit("sample_config.xml")
     low_findings = [f for f in result if f["severity"] == "LOW"]
     assert len(low_findings) == 1
+
+def test_nat_fixture_xml():
+    result = audit("test_nat_fixture.xml")
+    assert len(result) == 1
+    
