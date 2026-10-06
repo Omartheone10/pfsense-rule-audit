@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 
-
 def audit(config_path):
     tree = ET.parse(config_path)
     root = tree.getroot()
@@ -13,7 +12,7 @@ def audit(config_path):
         if rule_type is not None:
             rule_type_name = rule_type.text
             rule_log = rule.find('log')
-            if rule_log is None and rule_type_name == 'block':
+            if (rule_log is None) and (rule_type_name == 'block'):
                 finding = {
                     "rule_index": rule_index,
                     "severity": "MEDIUM",
@@ -58,7 +57,7 @@ def audit(config_path):
                 if rule_type is not None:
                     rule_type_name = rule_type.text
                     # Flag true any-any rules (source any + dest any + action pass)
-                    if source_any is not None and rule_type_name == 'pass' and dest_any is not None:
+                    if (source_any is not None) and (rule_type_name == 'pass') and (dest_any is not None):
                         # Creating a dictionary
                         finding = {
                             "rule_index": rule_index,
@@ -72,25 +71,54 @@ def audit(config_path):
                     port = rule.find('destination/port')
                     if port is not None:
                         port_number = port.text
-                        if (
-                                port_number == "22" or port_number == "80" or port_number == "443") and rule_type_name == "pass":
-                            finding = {
-                                "rule_index": rule_index,
-                                "severity": "HIGH",
-                                "score": 4,
-                                "message": "Admin service exposed on WAN"
-                            }
-                            findings.append(finding)
+
+                        if rule_type_name == "pass":
+                            if port_number == '22' or port_number == '23' or port_number == '3389':
+                                finding = {
+                                    "rule_index": rule_index,
+                                    "severity": "HIGH",
+                                    "score": 4,
+                                    "action": rule_type_name,
+                                    "message": "Remote-management port exposed"
+                                }
+                                findings.append(finding)
+
+                            else:
+                                if port_number == '80' or port_number == '443':
+                                    destination = rule.find('destination/address')
+                                    if destination is None:
+                                        destination_ip = ""
+                                    if destination is not None:
+                                        destination_ip = destination.text
+
+                                    if destination_ip.startswith(("192.168.", "10.","172.")):
+                                        finding = {
+                                            "rule_index": rule_index,
+                                            "severity": "LOW",
+                                            "score": 2,
+                                            "action": rule_type_name,
+                                            "message": "Published service - verify intended"
+                                        }
+                                        findings.append(finding)
+
+                                    else:
+                                        finding = {
+                                            "rule_index": rule_index,
+                                            "severity": "HIGH",
+                                            "score": 4,
+                                            "action": rule_type_name,
+                                            "message": "Admin service exposed on WAN"
+                                        }
+                                        findings.append(finding)
 
         rule_index += 1
     return findings
-
 
 if __name__ == '__main__':
     findings = audit("sample_config.xml")
     print(findings)
 
-    
+
 
 
 
