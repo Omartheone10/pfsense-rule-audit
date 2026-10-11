@@ -1,3 +1,4 @@
+
 import xml.etree.ElementTree as ET
 
 def audit(config_path):
@@ -91,7 +92,7 @@ def audit(config_path):
                                     if destination is not None:
                                         destination_ip = destination.text
 
-                                    if destination_ip.startswith(("192.168.", "10.","172.")):
+                                    if destination_ip.startswith(("192.168.", "10.","172.16.","172.17.","172.18.","172.19.","172.20." ,"172.21.", "172.22.", "172.23.","172.24.","172.25.","172.26.", "172.27.", "172.28.","172.29.","172.30.","172.31.")):
                                         finding = {
                                             "rule_index": rule_index,
                                             "severity": "LOW",
