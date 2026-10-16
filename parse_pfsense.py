@@ -5,8 +5,10 @@ def audit(config_path):
     tree = ET.parse(config_path)
     root = tree.getroot()
     findings = []
-    # Find all the 'rule' one by one
     rule_index = 1
+    seen_wan_any_any = False
+
+    # Find all the 'rule' one by one
     for rule in root.findall('./filter/rule'):
 
         rule_type = rule.find('type')
@@ -49,6 +51,15 @@ def audit(config_path):
         if interface is not None:
             interface_name = interface.text
             if interface_name == 'wan':
+
+                if seen_wan_any_any == True:
+                    finding = {
+                        "rule_index": rule_index,
+                        "severity": "Low",
+                        "score": 2,
+                        "message": "Rule is shadowed by previous Any-Any rule"
+                    }
+                    findings.append(finding)
                 # Find source tag's child element any
                 source_any = rule.find('source/any')
 
@@ -68,6 +79,8 @@ def audit(config_path):
                             "message": "True Any-Any rule on WAN"
                         }
                         findings.append(finding)
+
+                        seen_wan_any_any = True
 
                     port = rule.find('destination/port')
                     if port is not None:
