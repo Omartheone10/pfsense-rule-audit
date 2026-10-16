@@ -1,4 +1,4 @@
-
+import argparse
 import xml.etree.ElementTree as ET
 
 def audit(config_path):
@@ -116,8 +116,14 @@ def audit(config_path):
     return findings
 
 if __name__ == '__main__':
-    findings = audit("sample_config.xml")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config')
+    args = parser.parse_args()
+
+    findings = audit(args.config)
     print(findings)
+
+
 
 
 
