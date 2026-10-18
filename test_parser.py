@@ -52,7 +52,6 @@ def shadow_xml():
 
     return file_name
 
-
 def test_shadow_detection(shadow_xml):
     result = audit(shadow_xml)
     shadow_findings = [f for f in result if "shadow" in f["message"].lower()]
