@@ -34,6 +34,8 @@ def audit(config_path):
                 "message": "Rule is disabled - consider cleanup"
             }
             findings.append(finding)
+            rule_index += 1
+            continue
 
         # Finding if a rule missing the description tag
         descr = rule.find('descr')
