@@ -18,6 +18,7 @@ def audit(config_path):
             if (rule_log is None) and (rule_type_name == 'block'):
                 finding = {
                     "rule_index": rule_index,
+                    "finding_id": "PF-LOG-001",
                     "severity": "MEDIUM",
                     "score": 3,
                     "message": 'Rule missing log'
@@ -29,6 +30,7 @@ def audit(config_path):
         if disabled_rule is not None:
             finding = {
                 "rule_index": rule_index,
+                "finding_id": "PF-STATE-001",
                 "severity": 'LOW',
                 "score": 2,
                 "message": "Rule is disabled - consider cleanup"
@@ -42,6 +44,7 @@ def audit(config_path):
         if descr is None:
             finding = {
                 "rule_index": rule_index,
+                "finding_id": "PF-DOC-001",
                 "severity": "MEDIUM",
                 "score": 3,
                 "message": "Rule missing description"
@@ -56,6 +59,7 @@ def audit(config_path):
                 if seen_wan_any_any == True:
                     finding = {
                         "rule_index": rule_index,
+                        "finding_id": "PF-SHADOW-001",
                         "severity": "LOW",
                         "score": 2,
                         "message": "Rule is shadowed by previous Any-Any rule"
@@ -74,6 +78,7 @@ def audit(config_path):
                         # Creating a dictionary
                         finding = {
                             "rule_index": rule_index,
+                            "finding_id": "PF-WAN-001",
                             "severity": "CRITICAL",
                             "score": 5,
                             "action": rule_type_name,
@@ -91,6 +96,7 @@ def audit(config_path):
                             if port_number == '22' or port_number == '23' or port_number == '3389':
                                 finding = {
                                     "rule_index": rule_index,
+                                    "finding_id": "PF-WAN-002",
                                     "severity": "HIGH",
                                     "score": 4,
                                     "action": rule_type_name,
@@ -109,6 +115,7 @@ def audit(config_path):
                                     if destination_ip.startswith(("192.168.", "10.","172.16.","172.17.","172.18.","172.19.","172.20." ,"172.21.", "172.22.", "172.23.","172.24.","172.25.","172.26.", "172.27.", "172.28.","172.29.","172.30.","172.31.")):
                                         finding = {
                                             "rule_index": rule_index,
+                                            "finding_id": "PF-PUB-001",
                                             "severity": "LOW",
                                             "score": 2,
                                             "action": rule_type_name,
@@ -119,6 +126,7 @@ def audit(config_path):
                                     else:
                                         finding = {
                                             "rule_index": rule_index,
+                                            "finding_id": "PF-WAN-003",
                                             "severity": "HIGH",
                                             "score": 4,
                                             "action": rule_type_name,
