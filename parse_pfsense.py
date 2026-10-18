@@ -51,11 +51,10 @@ def audit(config_path):
         if interface is not None:
             interface_name = interface.text
             if interface_name == 'wan':
-
                 if seen_wan_any_any == True:
                     finding = {
                         "rule_index": rule_index,
-                        "severity": "Low",
+                        "severity": "LOW",
                         "score": 2,
                         "message": "Rule is shadowed by previous Any-Any rule"
                     }
