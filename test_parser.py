@@ -16,11 +16,11 @@ def test_critical_findings_count():
     
     # Extract the rule number and finding ID into a list of tuples
     finding_pairs = [(f["rule_index"], f["finding_id"]) for f in critical_findings]
-    
+
     # Assert the exact matches exist
     assert (5, "PF-WAN-001") in finding_pairs
     assert (7, "PF-WAN-001") in finding_pairs
-    
+
     # Keep the count check to be safe
     assert len(critical_findings) == 2
 
@@ -39,11 +39,11 @@ def test_nat_fixture_xml():
     assert len(result) == 1
 
 @pytest.fixture
-def shadow_xml():
-    file_name = "shadow_test.xml"
-    with open(file_name, "w") as f:
-        f.write("""<pfsense>
-      <filter>
+def shadow_xml(tmp_path):
+    file_name = tmp_path / "shadow_test.xml"
+
+    file_name.write_text("""<pfsense>
+        <filter>
         <rule>
           <interface>wan</interface>
           <type>pass</type>
@@ -59,7 +59,7 @@ def shadow_xml():
       </filter>
     </pfsense>""")
 
-    return file_name
+    return str(file_name)
 
 def test_shadow_detection(shadow_xml):
     result = audit(shadow_xml)
