@@ -13,6 +13,15 @@ def test_high_severity_finding_count():
 def test_critical_findings_count():
     result = audit("sample_config.xml")
     critical_findings = [ f for f in result if f["severity"] == "CRITICAL"]
+    
+    # Extract the rule number and finding ID into a list of tuples
+    finding_pairs = [(f["rule_index"], f["finding_id"]) for f in critical_findings]
+    
+    # Assert the exact matches exist
+    assert (5, "PF-WAN-001") in finding_pairs
+    assert (7, "PF-WAN-001") in finding_pairs
+    
+    # Keep the count check to be safe
     assert len(critical_findings) == 2
 
 def test_medium_findings_count():
