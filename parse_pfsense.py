@@ -1,8 +1,21 @@
 import argparse
 import xml.etree.ElementTree as ET
+import os
+import sys
 
 def audit(config_path):
-    tree = ET.parse(config_path)
+    try:
+        file_size = os.path.getsize(config_path)
+
+        if file_size > (10 * 1024 * 1024):
+            raise ValueError(f"File {config_path} exceeds the 10 MiB limit.")
+
+        tree = ET.parse(config_path)
+    except FileNotFoundError:
+        raise ValueError(f"File {config_path} not found")
+    except ET.ParseError:
+        raise ValueError(f"File {config_path} not a valid XML")
+
     root = tree.getroot()
     findings = []
     rule_index = 1
@@ -142,12 +155,12 @@ if __name__ == '__main__':
     parser.add_argument('config')
     args = parser.parse_args()
 
-    findings = audit(args.config)
-    print(findings)
-
-
-
-
+    try:
+        findings = audit(args.config)
+        print(findings)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(2)
 
 
 
