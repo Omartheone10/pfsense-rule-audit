@@ -1,0 +1,26 @@
+name: Python Tests
+
+on:
+  push:
+    branches: main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    # 1. Copies your repo onto the GitHub server
+    - uses: actions/checkout@v4
+    
+    # 2. Installs Python on the server
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        
+    # 3. Installs the specific packages our script needs to run
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install defusedxml pytest  # Hint: the two external libraries we use
+        
+    # 4. Runs our test suite
+    - name: Run Pytest
+      run: pytest -v  # Hint: the terminal command we run to test our code
