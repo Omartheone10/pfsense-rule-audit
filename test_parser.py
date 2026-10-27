@@ -13,7 +13,7 @@ def test_high_severity_finding_count():
 def test_critical_findings_count():
     result = audit("sample_config.xml")
     critical_findings = [ f for f in result if f["severity"] == "CRITICAL"]
-    
+
     # Extract the rule number and finding ID into a list of tuples
     finding_pairs = [(f["rule_index"], f["finding_id"]) for f in critical_findings]
 
@@ -65,4 +65,9 @@ def test_shadow_detection(shadow_xml):
     result = audit(shadow_xml)
     shadow_findings = [f for f in result if "shadow" in f["message"].lower()]
     assert len(shadow_findings) == 1
+
+def test_missing_file_raises_error():
+    with pytest.raises(ValueError):
+        audit("missing_file.xml")
+
 

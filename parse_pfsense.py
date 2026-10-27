@@ -1,5 +1,6 @@
+import ipaddress
 import argparse
-import xml.etree.ElementTree as ET
+import defusedxml.ElementTree as ET
 import os
 import sys
 
@@ -101,6 +102,7 @@ def audit(config_path):
 
                         seen_wan_any_any = True
 
+                    port = ""
                     port = rule.find('destination/port')
                     if port is not None:
                         port_number = port.text
@@ -125,7 +127,12 @@ def audit(config_path):
                                     if destination is not None:
                                         destination_ip = destination.text
 
-                                    if destination_ip.startswith(("192.168.", "10.","172.16.","172.17.","172.18.","172.19.","172.20." ,"172.21.", "172.22.", "172.23.","172.24.","172.25.","172.26.", "172.27.", "172.28.","172.29.","172.30.","172.31.")):
+                                    try:
+                                        is_priv = ipaddress.ip_address(destination_ip).is_private
+                                    except ValueError:
+                                        is_priv = False
+
+                                    if is_priv:
                                         finding = {
                                             "rule_index": rule_index,
                                             "finding_id": "PF-PUB-001",
