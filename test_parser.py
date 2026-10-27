@@ -70,4 +70,32 @@ def test_missing_file_raises_error():
     with pytest.raises(ValueError):
         audit("missing_file.xml")
 
+def test_public_172_160_ip_flagged_high(tmp_path):
+    xml_content = """<pfsense>
+        <filter>
+            <rule>
+                <interface>wan</interface>
+                <type>pass</type>
+                <source><any/></source>
+                <destination>
+                    <address>172.160.1.1</address>
+                    <port>443</port> 
+                </destination>
+                <descr>test</descr>
+            </rule>
+        </filter>
+    </pfsense>"""
+    config_file = tmp_path / "test_ip.xml"
+    config_file.write_text(xml_content)
+
+    result = audit(str(config_file))
+
+    assert len(result) == 1
+    assert result[0]["finding_id"] =="PF-WAN-003"
+
+
+
+
+
+
 
