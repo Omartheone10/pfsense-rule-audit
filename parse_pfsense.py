@@ -122,9 +122,9 @@ def audit(config_path):
                             else:
                                 if port_number == '80' or port_number == '443':
                                     destination = rule.find('destination/address')
-                                    if destination is None:
+                                    if destination is None or destination.text is None:
                                         destination_ip = ""
-                                    if destination is not None:
+                                    else:
                                         destination_ip = destination.text
 
                                     try:
