@@ -93,7 +93,24 @@ def test_public_172_160_ip_flagged_high(tmp_path):
     assert len(result) == 1
     assert result[0]["finding_id"] =="PF-WAN-003"
 
+def test_disabled_block_rule_skips_log_check(tmp_path):
+    xml_content = """<pfsense>
+    <filter>
+        <rule>
+            <interface>wan</interface>
+            <type>block</type>
+            <source><any/></source>
+            <destination><any/></destination>
+            <disabled/>
+        </rule>
+    </filter>
+</pfsense>"""
+    config_file = tmp_path / "test_disabled_block_rule.xml"
+    config_file.write_text(xml_content)
+    result = audit(str(config_file))
 
+    assert len(result) == 1
+    assert result[0]["finding_id"] =="PF-STATE-001"
 
 
 

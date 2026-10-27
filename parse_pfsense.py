@@ -25,20 +25,6 @@ def audit(config_path):
     # Find all the 'rule' one by one
     for rule in root.findall('./filter/rule'):
 
-        rule_type = rule.find('type')
-        if rule_type is not None:
-            rule_type_name = rule_type.text
-            rule_log = rule.find('log')
-            if (rule_log is None) and (rule_type_name == 'block'):
-                finding = {
-                    "rule_index": rule_index,
-                    "finding_id": "PF-LOG-001",
-                    "severity": "MEDIUM",
-                    "score": 3,
-                    "message": 'Rule missing log'
-                }
-                findings.append(finding)
-
         # Finding if a rule is already disabled
         disabled_rule = rule.find('disabled')
         if disabled_rule is not None:
@@ -52,6 +38,20 @@ def audit(config_path):
             findings.append(finding)
             rule_index += 1
             continue
+
+        rule_type = rule.find('type')
+        if rule_type is not None:
+            rule_type_name = rule_type.text
+            rule_log = rule.find('log')
+            if (rule_log is None) and (rule_type_name == 'block'):
+                finding = {
+                    "rule_index": rule_index,
+                    "finding_id": "PF-LOG-001",
+                    "severity": "MEDIUM",
+                    "score": 3,
+                    "message": 'Rule missing log'
+                }
+                findings.append(finding)
 
         # Finding if a rule missing the description tag
         descr = rule.find('descr')
