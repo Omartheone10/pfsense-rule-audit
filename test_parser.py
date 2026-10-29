@@ -113,6 +113,12 @@ def test_disabled_block_rule_skips_log_check(tmp_path):
     assert result[0]["finding_id"] =="PF-STATE-001"
 
 
+def test_malformed_xml_raises_error(tmp_path):
+    xml_content = """<pfsense><filter>"""
+    file_path = tmp_path / "malformed_xml.xml"
+    file_path.write_text(xml_content)
+    with pytest.raises(ValueError):
+        audit(str(file_path))
 
 
 
