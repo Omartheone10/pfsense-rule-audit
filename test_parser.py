@@ -8,6 +8,10 @@ def test_total_findings_count():
 def test_high_severity_finding_count():
     result = audit("sample_config.xml")
     high_findings = [f for f in result if f["severity"] == "HIGH"]
+
+    finding_pairs = [(f["rule_index"], f["finding_id"]) for f in high_findings]
+
+    assert(9, "PF-WAN-002") in finding_pairs
     assert len(high_findings) == 1
 
 def test_critical_findings_count():
@@ -32,10 +36,19 @@ def test_medium_findings_count():
 def test_low_findings_count():
     result = audit("sample_config.xml")
     low_findings = [f for f in result if f["severity"] == "LOW"]
+    finding_pairs = [(f["rule_index"], f["finding_id"]) for f in low_findings]
+    assert (1, "PF-PUB-001") in finding_pairs
+    assert (7, "PF-SHADOW-001") in finding_pairs
+    assert (8, "PF-STATE-001") in finding_pairs
+    assert (9, "PF-SHADOW-001") in finding_pairs
+    assert (10, "PF-SHADOW-001") in finding_pairs
+
     assert len(low_findings) == 5
 
 def test_nat_fixture_xml():
     result = audit("test_nat_fixture.xml")
+    finding_pairs = [(f["rule_index"], f["finding_id"]) for f in result]
+    assert (1, "PF-DOC-001") in finding_pairs
     assert len(result) == 1
 
 @pytest.fixture
