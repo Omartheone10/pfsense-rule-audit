@@ -21,9 +21,9 @@ Manual security audits of pfSense rule sets are slow, repetitive, and error-pron
 | `PF-WAN-003` | **HIGH** | 4 | WAN `pass` rule on port 80/443 whose destination address is public, missing, or unparseable — admin/service exposure toward a non-internal destination |
 | `PF-PUB-001` | **LOW** | 2 | WAN `pass` rule on port 80/443 toward a private destination — published service, verify it is intended |
 | `PF-SHADOW-001` | **LOW** | 2 | WAN rule positioned after a any-any WAN pass — unreachable in the live path, shadowed by it |
-| `PF-LOG-001` | **MEDIUM** | 3 | `block` rule with no `<log/>` tag — blocked traffic you cannot review later |
+| `PF-LOG-001` | **MEDIUM** | 3 | Active `block` rule with no `<log/>` tag — blocked traffic you cannot review later |
 | `PF-DOC-001` | **MEDIUM** | 3 | Rule with no `<descr>` tag on any interface — undocumented intent |
-| `PF-STATE-001` | **LOW** | 2 | Rule with `<disabled/>` tag — cleanup candidate; flagged, then not evaluated further because it is not in the live path |
+| `PF-STATE-001` | **LOW** | 2 | Rule with `<disabled/>` tag — cleanup candidate; the disabled check runs first, so a disabled rule fires only this finding and is never evaluated as live path |
 
 Notes on the contract:
 
@@ -54,7 +54,7 @@ Python 3.8+. One runtime dependency:
 pip install defusedxml
 ```
 
-`defusedxml` is deliberate: a `config.xml` handed to you by a client is untrusted input, and stdlib `xml.etree` will happily expand entity bombs. Tests additionally need `pytest`.
+`defusedxml` is deliberate: a `config.xml` handed to you by a client is untrusted input, and stdlib `xml.etree` will happily expand entity bombs. Tests additionally need `pytest`. Both are listed in [`requirements.txt`](requirements.txt).
 
 ## Usage
 
@@ -77,7 +77,7 @@ Failures are quiet-free and machine-friendly:
 
 ## Tests and CI
 
-Nine tests, run by GitHub Actions on every push to `main` (Python 3.13), and locally with:
+Eleven tests, run by GitHub Actions on every push to `main` (Python 3.13), and locally with:
 
 ```bash
 pytest -v
@@ -87,9 +87,12 @@ What the suite pins down:
 
 - **Finding counts** on the sample: 16 total, and the exact per-severity split (2/1/8/5)
 - **Critical semantics**: the two CRITICAL findings are exactly `(rule 5, PF-WAN-001)` and `(rule 7, PF-WAN-001)` — asserted by ID, not by position luck
+- **High semantics**: the single HIGH finding is exactly `(rule 9, PF-WAN-002)`
+- **Low semantics**: all five LOW findings asserted as pairs — `(1, PF-PUB-001)`, `(7, PF-SHADOW-001)`, `(8, PF-STATE-001)`, `(9, PF-SHADOW-001)`, `(10, PF-SHADOW-001)`
 - **Shadow detection** on a generated two-rule config (`tmp_path` fixture): one any-any pass, one rule behind it, exactly one shadow finding
-- **NAT safety**: the `<nat>` fixture produces exactly one finding
-- **Error paths**: a missing file raises `ValueError` rather than crashing with a traceback
+- **NAT safety**: the `<nat>` fixture produces exactly one finding, `(1, PF-DOC-001)`
+- **Disabled-rule regression**: a disabled `block` rule yields exactly one finding — `PF-STATE-001` — pinning the check-order fix that evaluates disabled state before the log requirement, so a dead rule can never double-fire as missing-log
+- **Error paths**: a missing file and malformed XML both raise `ValueError` rather than crashing with a traceback
 - **Address parsing**: `172.160.1.1` on port 443 flags `PF-WAN-003` — 172.160.x.x looks like RFC1918 at a glance but is public space, and the `ipaddress` module (not a string check) is what catches it
 
 ## Limitations
@@ -99,8 +102,11 @@ Stated plainly, because an audit tool that overstates itself is worse than none:
 - **Does not resolve pfSense aliases** to actual IPs/ports — a rule whose port is an alias name is not matched by the port checks.
 - **Does not correlate with NAT / port-forwarding rules** — `<nat>` sections parse but are not audited yet.
 - **Port checks use exact string matching** — ranges like `80:85` are missed.
-- **Static XML only** — no live pfSense API access; you audit an export, not a running box.
-- **Shadow detection is scoped** to WAN rules behind an earlier any-any pass, not general pairwise shadowing.
+- **Static XML only** — no live pfSense API access or state table checks; you audit an export, not a running box.
+- **Protocol-blind shadowing** — detects WAN rules behind an earlier any-any pass, but does not differentiate between TCP, UDP, or ICMP.
+- **IPv6 is not supported** — only evaluates IPv4 addresses.
+- **Floating rules are not audited** — only standard interface-specific filters are evaluated.
+- **No schedule evaluation** — does not evaluate time-based rule schedules.
 - **Output is a raw list repr** — machine-readable, not yet pretty.
 
 Planned checks: duplicate rules, unused aliases, NAT entries without business purpose, VPN rules without source restrictions, and a JSON/pretty output mode.
@@ -111,6 +117,7 @@ Planned checks: duplicate rules, unused aliases, NAT entries without business pu
 - `ipaddress` over string comparison because near-miss address space (172.160/16 vs 172.16/12) is exactly where string checks fail.
 - Stable finding IDs because findings end up in tickets and client reports, where "the third item in yesterday's output" is not a reference.
 - Non-zero exit codes on bad input so the tool composes with scripts and CI instead of printing tracebacks into them.
+- The disabled check runs before the log check because a disabled rule is not in the live path — flagging it for missing logging would be a false positive. When that ordering was fixed, the regression test shipped in the same commit, so the fix cannot silently revert.
 
 ## License
 
